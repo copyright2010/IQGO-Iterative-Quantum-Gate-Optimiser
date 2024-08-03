@@ -1,0 +1,10 @@
+imbalanced_learn==0.12.3
+imblearn==0.0
+ipython==8.12.3
+numpy==2.0.1
+pandas==2.2.2
+qiskit==0.46.2
+qiskit_machine_learning==0.4.0
+qiskit_terra==0.46.2
+scikit_learn==1.5.1
+torch==2.3.1

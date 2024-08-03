@@ -1,0 +1,17 @@
+Metadata-Version: 2.1
+Name: IQGO_module
+Version: 0.0.1
+Summary: IQGO: Iterative Quantum Gate Optimiser
+Author-email: Tautvydas Lisas <D17125255@mytudublin.ie>
+Project-URL: Homepage, https://github.com/pypa/sampleproject
+Project-URL: Issues, https://github.com/pypa/sampleproject/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+This is a simple example package. You can use
+[GitHub-flavored Markdown](https://guides.github.com/features/mastering-markdown/)
+to write your content.

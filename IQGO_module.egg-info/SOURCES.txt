@@ -1,0 +1,8 @@
+LICENSE
+README.md
+pyproject.toml
+setup.py
+IQGO_module.egg-info/PKG-INFO
+IQGO_module.egg-info/SOURCES.txt
+IQGO_module.egg-info/dependency_links.txt
+IQGO_module.egg-info/top_level.txt

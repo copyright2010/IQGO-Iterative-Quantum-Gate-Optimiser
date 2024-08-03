@@ -94,7 +94,7 @@ for train_index, test_index in kf.split(data_train, train_labels):
 
     start_time = time.time()
 
-    if program == 'test':
+    elif program == 'test':
 
         end_time_train = time.time()
         execution_time = end_time_train - start_time

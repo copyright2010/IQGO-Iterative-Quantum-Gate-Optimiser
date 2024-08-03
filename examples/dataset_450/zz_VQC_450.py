@@ -154,7 +154,7 @@ for train_index, test_index in kf.split(data_train, train_labels):
         scor = balanced_accuracy_score(y_test, pred)
         cm = confusion_matrix(y_test, pred)
 
-    if program == 'val':
+    elif program == 'val':
 
         end_time_train = time.time()
         execution_time = end_time_train - start_time

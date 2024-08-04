@@ -1,6 +1,7 @@
 LICENSE
 README.md
 pyproject.toml
+setup.py
 src/IQGO_module/BaseIQGO.py
 src/IQGO_module/__init__.py
 src/IQGO_module/iqgo_optimize_module.py

@@ -1,4 +1,4 @@
-import IQGO_module.iqgo_training
+import IQGO_module
 
 
 def main():

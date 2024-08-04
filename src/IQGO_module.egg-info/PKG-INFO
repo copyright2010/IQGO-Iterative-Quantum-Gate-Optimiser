@@ -2,13 +2,15 @@ Metadata-Version: 2.1
 Name: IQGO_module
 Version: 0.0.1
 Summary: IQGO: Iterative Quantum Gate Optimiser
+Home-page: https://github.com/copyright2010/IQGO-Iterative-Quantum-Gate-Optimiser
+Author: Tautvydas Lisas
 Author-email: Tautvydas Lisas <D17125255@mytudublin.ie>
-Project-URL: Homepage, https://github.com/pypa/sampleproject
-Project-URL: Issues, https://github.com/pypa/sampleproject/issues
+Project-URL: Homepage, https://github.com/copyright2010/IQGO-Iterative-Quantum-Gate-Optimser
+Project-URL: Issues, https://github.com/copyright2010/IQGO-Iterative-Quantum-Gate-Optimser
 Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: MIT License
 Classifier: Operating System :: OS Independent
-Requires-Python: >=3.8
+Requires-Python: >=3.6
 Description-Content-Type: text/markdown
 License-File: LICENSE
 

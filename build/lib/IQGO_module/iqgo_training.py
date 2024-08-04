@@ -10,12 +10,13 @@ from IQGO_module.iqgo_optimize_module import IQGO, IQGO_VQC
 from sklearn.model_selection import StratifiedKFold
 
 class IQGO_train():
-    def __init__(self, noise_level=0.2, seed_val=42, kfold_splits = 5):
+    def __init__(self, model=None, noise_level=0.2, seed_val=42, kfold_splits = 5):
         self.noise = noise_level
         self.kf = StratifiedKFold(n_splits=kfold_splits, shuffle=True, random_state=128*1)
         self.scaler = MinMaxScaler()
         self.rus = RandomUnderSampler(random_state=42)
         self.seed_val = seed_val
+        self.model = model
 
     def add_gaussian_noise(self, X, mean=0, std=0.2, seed=42):
         np.random.seed(seed)  # Set the seed
@@ -64,8 +65,9 @@ class IQGO_train():
 
                 matrix_train_normalised = self.scaler.fit_transform(X_train)
                 matrix_test_normalised = self.scaler.transform(X_test)
-
-                model = SVC(kernel='precomputed')
+                
+                if self.model == None:
+                    self.model = SVC(kernel='precomputed')
                 
                 iqgo = IQGO(matrix_train_normalised, y_train)
                 # iqgo.add_layer(layer_combination=1)
@@ -78,7 +80,7 @@ class IQGO_train():
 
                 mode = 'train'
                 if mode == 'train':
-                    accuracies_train, accuracies_test = iqgo.fit_layer(model, matrix_test_normalised, y_test)
+                    accuracies_train, accuracies_test = iqgo.fit_layer(self.model, matrix_test_normalised, y_test)
                     save_all_train.append(accuracies_train)
                     save_all_test.append(accuracies_test)
                     accuracies = accuracies_test
@@ -134,7 +136,8 @@ class IQGO_train():
             matrix_test_normalised = self.scaler.transform(X_test)
             matrix_val_normalised = self.scaler.transform(data_val)    
 
-            model = SVC(kernel='precomputed')
+            if self.model ==  None:
+                self.model = SVC(kernel='precomputed')
             
             iqgo = IQGO(matrix_train_normalised, y_train)
 
@@ -144,10 +147,10 @@ class IQGO_train():
                     iqgo.add_layer(layer_combination=np.array(combination))
 
             if mode == 'test':
-                predictions = iqgo.predict(model, matrix_test_normalised)
+                predictions = iqgo.predict(self.model, matrix_test_normalised)
                 accuracies = balanced_accuracy_score(y_test, predictions)
             elif mode == 'val':
-                predictions = iqgo.predict(model, matrix_val_normalised)
+                predictions = iqgo.predict(self.model, matrix_val_normalised)
                 accuracies = balanced_accuracy_score(val_labels, predictions)
             
             save_all.append(accuracies)

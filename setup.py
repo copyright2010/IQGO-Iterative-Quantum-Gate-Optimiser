@@ -9,7 +9,8 @@ setup(
     long_description=open('README.md').read(),
     long_description_content_type='Classification Algorithm',
     url='https://github.com/copyright2010/IQGO-Iterative-Quantum-Gate-Optimiser', 
-    packages=find_packages(),
+    package_dir={'': 'src'},  # Add this line to specify the src directory
+    packages=find_packages(where='src'),
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',

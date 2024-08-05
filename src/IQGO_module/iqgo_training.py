@@ -46,7 +46,7 @@ class IQGO_train():
 
         save_all, save_all_train, save_all_test, save, compiled_circuit = [], [], [], [], []
 
-        if data_val == None and val_labels == None:
+        if data_val is None and val_labels is None:
             data_train, data_val, train_labels, val_labels = train_test_split(data_train, labels, train_size=0.66, random_state=123, stratify = labels)
         
         data_train, train_labels = self.rus.fit_resample(data_train, train_labels)
@@ -117,7 +117,7 @@ class IQGO_train():
     
     def predict(self, data_train=None, labels=None ,data_val=None, val_labels=None, compiled_circuit=None, mode = 'val'):
         
-        if data_val == None and val_labels == None:
+        if data_val is None and val_labels is None:
             data_train, data_val, train_labels, val_labels = train_test_split(data_train, labels, train_size=0.66, random_state=123, stratify = labels)
         
         data_train, train_labels = self.rus.fit_resample(data_train, train_labels)
@@ -201,7 +201,6 @@ class IQGO_trainVQC():
 
 
     def fit(self, data_train, labels, number_of_layers):
-
 
         save_all, save_all_train, save_all_test, save, compiled_circuit = [], [], [], [], []
 

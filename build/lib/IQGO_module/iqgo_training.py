@@ -46,7 +46,7 @@ class IQGO_train():
 
         save_all, save_all_train, save_all_test, save, compiled_circuit = [], [], [], [], []
 
-        if data_val == None and val_labels == None:
+        if data_val is None and val_labels is None:
             data_train, data_val, train_labels, val_labels = train_test_split(data_train, labels, train_size=0.66, random_state=123, stratify = labels)
         
         data_train, train_labels = self.rus.fit_resample(data_train, train_labels)
@@ -115,9 +115,9 @@ class IQGO_train():
 
         return compiled_circuit
     
-    def predict(self, data_train=None, labels=None ,data_val=None, val_labels=None, compiled_circuit, mode = 'val'):
+    def predict(self, data_train=None, labels=None ,data_val=None, val_labels=None, compiled_circuit=None, mode = 'val'):
         
-        if data_val == None and val_labels == None:
+        if data_val is None and val_labels is None:
             data_train, data_val, train_labels, val_labels = train_test_split(data_train, labels, train_size=0.66, random_state=123, stratify = labels)
         
         data_train, train_labels = self.rus.fit_resample(data_train, train_labels)
@@ -142,7 +142,7 @@ class IQGO_train():
             
             iqgo = IQGO(matrix_train_normalised, y_train)
 
-            if len(compiled_circuit) != 0:
+            if len(compiled_circuit) != None:
                 for combination in compiled_circuit:
                     print('add layer: ', combination)
                     iqgo.add_layer(layer_combination=np.array(combination))
@@ -201,7 +201,6 @@ class IQGO_trainVQC():
 
 
     def fit(self, data_train, labels, number_of_layers):
-
 
         save_all, save_all_train, save_all_test, save, compiled_circuit = [], [], [], [], []
 

@@ -45,14 +45,14 @@ for noise in seeds:
 
     init_iqgo = IQGO_train(noise_level = 0.2, seed_val=noise, kfold_splits=5)
 
-    #fitted_circuit = init_iqgo.fit(data_train2, labels, number_of_layers = 3)
+    fitted_circuit = init_iqgo.fit(data_train=data_train2, labels=labels, number_of_layers = 3)
 
     fitted_circuit = np.array([13, 26, 8]) #best
 
-    predictions, column_means = init_iqgo.predict(data_train2, labels, fitted_circuit,'test')
+    predictions, column_means = init_iqgo.predict(data_train = data_train2, labels = labels, compiled_circuit=fitted_circuit,mode='test')
     acc_test.append(column_means)
     
-    predictions, column_means = init_iqgo.predict(data_train2, labels, fitted_circuit,'val')
+    predictions, column_means = init_iqgo.predict(data_train = data_train2, labels = labels, compiled_circuit=fitted_circuit,mode='val')
     
     acc_val.append(column_means)
     save_noise.append(noise)

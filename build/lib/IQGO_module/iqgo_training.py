@@ -42,11 +42,12 @@ class IQGO_train():
         print(f"Noise-to-Signal Ratio: {nsr}")
 
 
-    def fit(self, data_train, labels, number_of_layers):
+    def fit(self, data_train=None, labels=None, data_val=None, val_labels=None, number_of_layers=3):
 
         save_all, save_all_train, save_all_test, save, compiled_circuit = [], [], [], [], []
 
-        data_train, data_val, train_labels, val_labels = train_test_split(data_train, labels, train_size=0.66, random_state=123, stratify = labels)
+        if data_val == None and val_labels == None:
+            data_train, data_val, train_labels, val_labels = train_test_split(data_train, labels, train_size=0.66, random_state=123, stratify = labels)
         
         data_train, train_labels = self.rus.fit_resample(data_train, train_labels)
 
@@ -114,10 +115,10 @@ class IQGO_train():
 
         return compiled_circuit
     
-
-    def predict(self, data_train, labels, compiled_circuit, mode = 'val'):
-
-        data_train, data_val, train_labels, val_labels = train_test_split(data_train, labels, train_size=0.66, random_state=123, stratify = labels)
+    def predict(self, data_train=None, labels=None ,data_val=None, val_labels=None, compiled_circuit, mode = 'val'):
+        
+        if data_val == None and val_labels == None:
+            data_train, data_val, train_labels, val_labels = train_test_split(data_train, labels, train_size=0.66, random_state=123, stratify = labels)
         
         data_train, train_labels = self.rus.fit_resample(data_train, train_labels)
         

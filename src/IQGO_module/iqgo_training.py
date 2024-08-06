@@ -8,6 +8,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import balanced_accuracy_score
 from IQGO_module.iqgo_optimize_module import IQGO, IQGO_VQC
 from sklearn.model_selection import StratifiedKFold
+from qiskit_machine_learning.kernels import QuantumKernel
+from qiskit import Aer
 
 class IQGO_train():
     def __init__(self, model=None, noise_level=0.2, seed_val=42, kfold_splits = 5):
@@ -142,7 +144,7 @@ class IQGO_train():
             
             iqgo = IQGO(matrix_train_normalised, y_train)
 
-            if len(compiled_circuit) != None:
+            if len(compiled_circuit) != 0:
                 for combination in compiled_circuit:
                     print('add layer: ', combination)
                     iqgo.add_layer(layer_combination=np.array(combination))
@@ -165,7 +167,25 @@ class IQGO_train():
         
         return predictions, column_means.mean()
     
+    def compile_kernel(self, data_train=None, labels=None ,data_val=None, val_labels=None, compiled_circuit=None):
 
+        iqgo = IQGO(data_train, labels)
+
+        if len(compiled_circuit) != 0:
+            for combination in compiled_circuit:
+                print('add layer: ', combination)
+                quantum_circuit = iqgo.add_layer(layer_combination=np.array(combination))
+        
+        kernel = QuantumKernel(feature_map=quantum_circuit, quantum_instance=Aer.get_backend('statevector_simulator'))
+
+        matrix_train = kernel.evaluate(data_train)
+        #matrix_train = self.kernel_alignment(matrix_train, self.y_train)
+        # matrix_train = self.regularized_kernel_matrix(matrix_train)
+
+        # Evaluate the kernel matrix for testing
+        matrix_val = kernel.evaluate(x_vec=data_val, y_vec=data_train)
+
+        return matrix_train, matrix_val
 
 class IQGO_trainVQC():
     def __init__(self, noise_level=0.2, seed_val=42, kfold_splits = 5):
@@ -322,3 +342,4 @@ class IQGO_trainVQC():
             #     print(f'Index: {idx}, Value: {value}')
         
         return predictions, column_means.mean()
+    

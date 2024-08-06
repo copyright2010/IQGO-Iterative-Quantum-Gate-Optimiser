@@ -179,14 +179,9 @@ class IQGO_train():
         kernel = QuantumKernel(feature_map=quantum_circuit, quantum_instance=Aer.get_backend('statevector_simulator'))
 
         matrix_train = kernel.evaluate(data_train)
-        #matrix_train = self.kernel_alignment(matrix_train, self.y_train)
-        # matrix_train = self.regularized_kernel_matrix(matrix_train)
-
-        # Evaluate the kernel matrix for testing
         matrix_val = kernel.evaluate(x_vec=data_val, y_vec=data_train)
 
         return matrix_train, matrix_val
-
 class IQGO_trainVQC():
     def __init__(self, noise_level=0.2, seed_val=42, kfold_splits = 5):
         self.noise = noise_level

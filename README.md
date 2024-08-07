@@ -17,7 +17,7 @@ X, y = load_iris(return_X_y=True, as_frame=True)
 
 acc_test, acc_val, save_noise, cct = [], [], [], []
 
-# test multiple seed values for gaussian noise. 
+# test multiple seed values for gaussian noise
 seeds = np.array([3646,5634,2342,234,546,564])
 
 for noise in seeds:
@@ -27,7 +27,7 @@ for noise in seeds:
 
     fitted_circuit = init_iqgo.fit(data_train=X, labels=y, number_of_layers = 3)
 
-    # select the best compiled circuit
+    # hardcode the best compiled circuit for testing 
     #fitted_circuit = np.array([13, 26, 8]) #best
 
     predictions, column_means = init_iqgo.predict(data_train = X, labels = y, compiled_circuit=fitted_circuit,mode='test')

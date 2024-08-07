@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='IQGO_module',
-    version='0.1.0',
+    version='0.1.1',
     author='Tautvydas Lisas',
     author_email='d17125255@mytudublin.ie',
     description='IQGO: Iterative Quantum Gate Optimiser',

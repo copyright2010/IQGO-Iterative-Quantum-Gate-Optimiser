@@ -1,7 +1,6 @@
 ```sh
 pip install IQGO-module
 
-```sh
 from IQGO_module.iqgo_training import IQGO_train
 import numpy as np
 import pandas as pd

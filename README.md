@@ -1,12 +1,14 @@
-## Installation
+# IQGO Module
 
+## Installation
 To install the IQGO module, run the following command:
 
 ```sh
 pip install IQGO-module
-
+```
 
 ## Getting Started
+```
 from IQGO_module.iqgo_training import IQGO_train
 import numpy as np
 import pandas as pd
@@ -50,3 +52,4 @@ all = pd.DataFrame([save_noise, acc_test, acc_val, cct])
 
 # save the compiled circuits to select the best one
 all.to_csv('compiled_circuits.csv')
+```

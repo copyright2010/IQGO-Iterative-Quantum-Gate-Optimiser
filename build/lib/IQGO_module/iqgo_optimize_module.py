@@ -63,15 +63,22 @@ class IQGO:
             qc = BaseIQGO(number_of_qubits=self.num_qubits, combination=comb, quantum_circuit=quantum_circuit_copy, parameter_vector=self.parameter_vector).compile_circuit()
                     
             # Generate the quantum circuit for the feature map
-            print(qc.draw())
+            #print(qc.draw())
             
             # Create a quantum kernel with the feature map
             self.kernel = QuantumKernel(feature_map=qc, quantum_instance=Aer.get_backend('statevector_simulator'))
             # Evaluate the kernel matrix for training
             
             matrix_train = self.kernel.evaluate(self.X_train)
-            #matrix_train = self.kernel_alignment(matrix_train, self.y_train)
 
+            #matrix_train = self.kernel_alignment(matrix_train, self.y_train)
+            constant_features = np.array([np.all(np.isclose(matrix_train[:, col], matrix_train[0, col])) for col in range(matrix_train.shape[1])])
+            constant_feature_indices = np.atleast_1d(np.where(constant_features)[0])
+
+            noise_level_kernel = 0.01  # Adjust based on your data
+            for i in constant_feature_indices:
+                matrix_train[:, i] -= np.random.normal(0, noise_level_kernel, size=matrix_train.shape[0])
+            
             # Fit the model using the training kernel matrix
             model.fit(matrix_train, self.y_train)
 
@@ -187,7 +194,7 @@ class IQGO_VQC:
             qc = BaseIQGO(number_of_qubits=self.num_qubits, combination=comb, quantum_circuit=quantum_circuit_copy, parameter_vector=self.parameter_vector).compile_circuit()
                     
             # Generate the quantum circuit for the feature map
-           # print(qc.draw())
+            # print(qc.draw())
 
             # Create a quantum kernel with the feature map
             #self.kernel = QuantumKernel(feature_map=qc, quantum_instance=Aer.get_backend('statevector_simulator'))

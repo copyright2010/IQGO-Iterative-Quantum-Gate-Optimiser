@@ -46,7 +46,7 @@ jobs:
           [pypi]
           repository=https://upload.pypi.org/legacy/
           username=__token__
-          password=${{ secrets.PYPI_TOKEN.PYPI_TOKEN_TEST }}
+          password=${{secrets.PYPI_TOKEN.PYPI_TOKEN_TEST}}
           EOF
           python -m pip install keyrings.alt
           python -c "import setuptools; setuptools.setup()"

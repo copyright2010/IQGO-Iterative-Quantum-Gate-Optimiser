@@ -1,6 +1,6 @@
 [project]
 name = "IQGO_module"
-version = "0.0.1"
+version = "0.1.0"
 authors = [
   { name="Tautvydas Lisas", email="D17125255@mytudublin.ie" },
 ]

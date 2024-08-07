@@ -38,7 +38,7 @@ class IQGO:
     
     def cross_entropy_loss(self, y_true, y_pred):
         # Ensure y_pred and y_true are tensors
-        y_pred = torch.tensor(y_pred, dtype=torch.float32)
+        y_pred = torch.tensor(y_pred.flatten(), dtype=torch.float32)
         y_true = torch.tensor(np.array(y_true), dtype=torch.float32)
         
         # Use PyTorch's cross-entropy loss
@@ -75,10 +75,10 @@ class IQGO:
             constant_features = np.array([np.all(np.isclose(matrix_train[:, col], matrix_train[0, col])) for col in range(matrix_train.shape[1])])
             constant_feature_indices = np.atleast_1d(np.where(constant_features)[0])
 
-            noise_level_kernel = 0.01  # Adjust based on your data
+            noise_level_kernel = 0.1  # Adjust based on your data
             for i in constant_feature_indices:
                 matrix_train[:, i] -= np.random.normal(0, noise_level_kernel, size=matrix_train.shape[0])
-            
+
             # Fit the model using the training kernel matrix
             model.fit(matrix_train, self.y_train)
 

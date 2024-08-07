@@ -42,7 +42,16 @@ jobs:
           PYPI_USERNAME: __token__
           PYPI_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
-          python -m pip install keyring artifacts-keyrings-pytest
+          cat >~/.pypirc <<EOF
+          [distutils]
+          index-servers = pypi
+
+          [pypi]
+          repository=https://upload.pypi.org/legacy/
+          username=__token__
+          password=${{ secrets.PYPI_TOKEN }}
+          EOF
+          python -m pip install keyrings.alt
           python -c "import setuptools; setuptools.setup()"
           python -m build
           python -m twine upload --repository pypi dist/* --username $PYPI_USERNAME --password $PYPI_PASSWORD

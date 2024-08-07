@@ -5,8 +5,8 @@ Summary: IQGO: Iterative Quantum Gate Optimiser
 Home-page: https://github.com/copyright2010/IQGO-Iterative-Quantum-Gate-Optimiser
 Author: Tautvydas Lisas
 Author-email: Tautvydas Lisas <D17125255@mytudublin.ie>
-Project-URL: Homepage, https://github.com/copyright2010/IQGO-Iterative-Quantum-Gate-Optimser
-Project-URL: Issues, https://github.com/copyright2010/IQGO-Iterative-Quantum-Gate-Optimser
+Project-URL: Homepage, https://github.com/copyright2010/IQGO-Iterative-Quantum-Gate-Optimiser
+Project-URL: Issues, https://github.com/copyright2010/IQGO-Iterative-Quantum-Gate-Optimiser
 Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: MIT License
 Classifier: Operating System :: OS Independent

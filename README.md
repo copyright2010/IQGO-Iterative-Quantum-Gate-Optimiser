@@ -1,6 +1,12 @@
+## Installation
+
+To install the IQGO module, run the following command:
+
 ```sh
 pip install IQGO-module
 
+
+### Getting Started
 from IQGO_module.iqgo_training import IQGO_train
 import numpy as np
 import pandas as pd

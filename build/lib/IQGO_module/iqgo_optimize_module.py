@@ -187,7 +187,7 @@ class IQGO_VQC:
             qc = BaseIQGO(number_of_qubits=self.num_qubits, combination=comb, quantum_circuit=quantum_circuit_copy, parameter_vector=self.parameter_vector).compile_circuit()
                     
             # Generate the quantum circuit for the feature map
-            print(qc.draw())
+           # print(qc.draw())
 
             # Create a quantum kernel with the feature map
             #self.kernel = QuantumKernel(feature_map=qc, quantum_instance=Aer.get_backend('statevector_simulator'))

@@ -175,13 +175,16 @@ class IQGO_train():
             for combination in compiled_circuit:
                 print('add layer: ', combination)
                 quantum_circuit = iqgo.add_layer(layer_combination=np.array(combination))
-        
+        print(quantum_circuit)
         kernel = QuantumKernel(feature_map=quantum_circuit, quantum_instance=Aer.get_backend('statevector_simulator'))
 
         matrix_train = kernel.evaluate(data_train)
         matrix_val = kernel.evaluate(x_vec=data_val, y_vec=data_train)
 
         return matrix_train, matrix_val
+
+
+
 class IQGO_trainVQC():
     def __init__(self, noise_level=0.2, seed_val=42, kfold_splits = 5):
         self.noise = noise_level

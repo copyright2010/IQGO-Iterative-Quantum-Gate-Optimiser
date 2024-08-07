@@ -114,6 +114,8 @@ class IQGO:
                                                 parameter_vector=self.parameter_vector).compile_circuit()
         except:
             print('add layer_combination')
+        
+        return self.quantum_circuit
 
     def add_gate(self):
 
@@ -127,6 +129,8 @@ class IQGO:
                 self.quantum_circuit.z(i)
         except:
             print('add layer_combination')
+
+
 
     def predict(self, model, X_val):
         # if self.kernel is None or self.X_train is None:

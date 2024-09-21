@@ -45,7 +45,7 @@ svc = SVC(kernel='rbf')
 scaler = MinMaxScaler()
 kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=128*1)
 
-save, score = [], []
+save, score, train_acc = [], [], []
 
 data_train, data_val, train_labels, val_labels = train_test_split(data_train2, labels, train_size=0.66, random_state=123, stratify = labels)
 rus = RandomUnderSampler(random_state=42)
@@ -81,6 +81,11 @@ for train_index, test_index in kf.split(data_train, train_labels):
     svc = SVC(kernel='precomputed')
 
     fitted = svc.fit(matrix_train, y_train)
+
+    pred_train = fitted.predict(matrix_train)
+    scor_train = balanced_accuracy_score(y_train, pred_train)
+    train_acc.append(scor_train)
+
 
     program = 'test'
 
@@ -126,7 +131,7 @@ for train_index, test_index in kf.split(data_train, train_labels):
     score.append(save_score)
 
 savedf = pd.DataFrame(score)
-
+print('Train acc: ', np.mean(train_acc))
 print(savedf)
 print(savedf.mean())
 

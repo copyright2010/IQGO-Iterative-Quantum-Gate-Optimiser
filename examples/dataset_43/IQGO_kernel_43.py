@@ -43,7 +43,7 @@ for noise in seeds:
 
     init_iqgo = IQGO_train(noise_level = 0.2, seed_val=noise, kfold_splits=5)
 
-    fitted_circuit = init_iqgo.fit(data_train=data_train2, labels=labels, number_of_layers = 3)
+#    fitted_circuit = init_iqgo.fit(data_train=data_train2, labels=labels, number_of_layers = 3)
 
     fitted_circuit = np.array([13, 26, 8]) #best
 

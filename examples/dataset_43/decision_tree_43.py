@@ -10,6 +10,8 @@ from catboost import CatBoostClassifier
 from sklearn.model_selection import StratifiedKFold, train_test_split
 from imblearn.under_sampling import RandomUnderSampler
 import time
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
 
 dataset = openml.datasets.get_dataset(43)
 X, y, categorical_indicator, attribute_names = dataset.get_data(
@@ -38,14 +40,8 @@ data_train2 = df.drop(columns=['labels'])
 labels = df['labels']
 
 
-svc = SVC(kernel='poly')
 
-cat_model = CatBoostClassifier(
-    iterations=500,
-    learning_rate=0.01,
-    depth=5,
-    random_seed=42+3000+800,
-    logging_level='Silent')
+dt_clf = DecisionTreeClassifier(random_state=42)
 
 print(Counter(labels))
 
@@ -86,9 +82,9 @@ for train_index, test_index in kf.split(data_train, train_labels):
     test_labels_meta_1 = y_test
     val_labels_meta_1 = val_labels
 
-    fitted = cat_model.fit(matrix_train_normalised, train_labels_meta_1)
+    fitted = dt_clf.fit(matrix_train_normalised, train_labels_meta_1)
 
-    program = 'test'
+    program = 'val'
 
     start_time = time.time()
 

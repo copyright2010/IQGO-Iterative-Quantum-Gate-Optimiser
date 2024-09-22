@@ -124,7 +124,7 @@ class IQGO_train():
         
         data_train, train_labels = self.rus.fit_resample(data_train, train_labels)
         
-        save_all = []
+        save_all, train_acc = [], []
 
         for train_index, test_index in self.kf.split(data_train, train_labels):
 
@@ -149,6 +149,10 @@ class IQGO_train():
                     print('add layer: ', combination)
                     iqgo.add_layer(layer_combination=np.array(combination))
 
+            predictions_train = iqgo.predict(self.model, matrix_train_normalised)
+            accuracies_train = balanced_accuracy_score(y_train, predictions_train)
+            train_acc.append(accuracies_train)
+
             if mode == 'test':
                 predictions = iqgo.predict(self.model, matrix_test_normalised)
                 accuracies = balanced_accuracy_score(y_test, predictions)
@@ -164,7 +168,8 @@ class IQGO_train():
             # print('Maximum values and their indexes test:')
             # for idx, value in max_values.items():
             #     print(f'Index: {idx}, Value: {value}')
-        
+        print('Train acc: ', np.mean(train_acc))
+
         return predictions, column_means.mean()
     
     def compile_kernel(self, data_train=None, labels=None ,data_val=None, val_labels=None, compiled_circuit=None):
@@ -299,7 +304,7 @@ class IQGO_trainVQC():
         
         data_train, train_labels = self.rus.fit_resample(data_train, train_labels)
         
-        save_all = []
+        save_all, train_acc = [], []
 
         for train_index, test_index in self.kf.split(data_train, train_labels):
 
@@ -323,6 +328,10 @@ class IQGO_trainVQC():
                     print('add layer: ', combination)
                     iqgo_vqc.add_layer(layer_combination=np.array(combination))
 
+            predictions_train = iqgo_vqc.predict(model, matrix_train_normalised)
+            accuracies_train = balanced_accuracy_score(y_train, predictions_train)
+            train_acc.append(accuracies_train)
+
             if mode == 'test':
                 predictions = iqgo_vqc.predict(model, matrix_test_normalised)
                 accuracies = balanced_accuracy_score(y_test, predictions)
@@ -338,6 +347,7 @@ class IQGO_trainVQC():
             # print('Maximum values and their indexes test:')
             # for idx, value in max_values.items():
             #     print(f'Index: {idx}, Value: {value}')
+        print('Train acc: ',np.mean(train_acc))
         
         return predictions, column_means.mean()
     

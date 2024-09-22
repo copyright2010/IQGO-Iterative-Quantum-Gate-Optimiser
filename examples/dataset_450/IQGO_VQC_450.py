@@ -51,9 +51,9 @@ for noise in seeds:
 
     init_iqgo = IQGO_trainVQC(noise_level = 0.2, seed_val=noise, kfold_splits=5)
     
-    fitted_circuit = init_iqgo.fit(data_train2, labels, number_of_layers = 3)
+    #fitted_circuit = init_iqgo.fit(data_train2, labels, number_of_layers = 3)
 
-    #fitted_circuit = np.array([8, 6, 3])
+    fitted_circuit = np.array([8, 6, 3])
 
     predictions, column_means = init_iqgo.predict(data_train2, labels, fitted_circuit,'test')
     acc_test.append(column_means)

@@ -73,7 +73,7 @@ import tensorflow as tf
 
 kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=128*1)
 
-score, save = [], []
+score, save, train_acc = [], [], []
 
 data_train, data_val, train_labels, val_labels = train_test_split(data_train2, labels, train_size=0.66, random_state=123, stratify = labels)
 rus = RandomUnderSampler(random_state=42)
@@ -132,6 +132,13 @@ for train_index, test_index in kf.split(data_train, train_labels):
 #    print(pd.DataFrame(y_train).values.reshape(-1, 1))
 
     fitted = vqc.fit(matrix_train_normalised, y_train_encoded)
+    pred_train = fitted.predict(matrix_train_normalised)
+
+    pred_train = encoder.inverse_transform(pred_train)
+
+    scor_train = balanced_accuracy_score(y_train, pred_train)
+    cm = confusion_matrix(y_train, pred_train)
+    train_acc.append(scor_train)
 
     program = 'val'
 
@@ -178,6 +185,7 @@ for train_index, test_index in kf.split(data_train, train_labels):
     score.append(save_score)
 
 savedf = pd.DataFrame(score)
+print('Train acc: ', np.mean(train_acc))
 
 print(savedf)
 print('accuracy: ',savedf.mean())

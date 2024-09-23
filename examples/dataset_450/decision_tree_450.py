@@ -15,8 +15,7 @@ from sklearn.tree import DecisionTreeClassifier
 
 dataset = openml.datasets.get_dataset(450)
 X, y, categorical_indicator, attribute_names = dataset.get_data(
-    dataset_format="array", target=dataset.default_target_attribute
-)
+    dataset_format="array", target=dataset.default_target_attribute)
 
 data = pd.DataFrame(X)
 data['y'] = pd.DataFrame(y)
@@ -67,7 +66,7 @@ rus = RandomUnderSampler(random_state=42)
 data_train, train_labels = rus.fit_resample(data_train, train_labels)
 
 for train_index, test_index in kf.split(data_train, train_labels):
-    
+
     X_train, X_test = data_train.iloc[train_index], data_train.iloc[test_index]
     y_train, y_test = train_labels.iloc[train_index], train_labels.iloc[test_index]
 
@@ -80,7 +79,6 @@ for train_index, test_index in kf.split(data_train, train_labels):
     # matrix_test_meta_1 = add_gaussian_noise(matrix_test_meta_1,mean=0, std=0, seed=42)
 
     # matrix_validate_meta_1 = add_gaussian_noise(matrix_validate_meta_1,mean=0, std=0.0, seed=23258)
-
 
     matrix_test_normalised = scaler.transform(X_test)
     #matrix_test_normalised = scaler2.transform(matrix_test_normalised)

@@ -54,7 +54,7 @@ print(Counter(labels))
 kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=128*1)
 scaler = MinMaxScaler()
 
-score, save_all = [], []
+score, save_all, scor_train = [], [], []
 
 data_train, data_val, train_labels, val_labels = train_test_split(data_train2, labels, train_size=0.66, random_state=123, stratify = labels)
 
@@ -88,13 +88,19 @@ for train_index, test_index in kf.split(data_train, train_labels):
     test_labels_meta_1 = y_test
     val_labels_meta_1 = val_labels
 
-    fitted = cat_model.fit(matrix_train_normalised, train_labels_meta_1)
+    fitted = svc.fit(matrix_train_normalised, train_labels_meta_1)
+    pred_train = fitted.predict(matrix_train_normalised)
+    
+    
+    scor_t = balanced_accuracy_score(train_labels_meta_1, pred_train)
+    # cm = confusion_matrix(train_labels_meta_1,pred_train)
+    scor_train.append(scor_t)
 
     program = 'test'
 
     start_time = time.time()
 
-    elif program == 'test':
+    if program == 'test':
 
         end_time_train = time.time()
         execution_time = end_time_train - start_time
@@ -110,7 +116,7 @@ for train_index, test_index in kf.split(data_train, train_labels):
         cm = confusion_matrix(test_labels_meta_1, pred)
 
 
-    if program == 'val':
+    elif program == 'val':
 
         end_time_train = time.time()
         execution_time = end_time_train - start_time
@@ -124,6 +130,7 @@ for train_index, test_index in kf.split(data_train, train_labels):
     
         scor = balanced_accuracy_score(val_labels_meta_1, pred)
         cm = confusion_matrix(val_labels_meta_1, pred)
+    print('Train acc: ', np.mean(scor_train))
 
     print(scor)
     print(cm)

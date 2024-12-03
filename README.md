@@ -18,8 +18,8 @@ X, y = load_iris(return_X_y=True, as_frame=True)
 
 acc_test, acc_val, save_noise, cct = [], [], [], []
 
-# test multiple seed values for gaussian noise
-seeds = np.array([3646,5634,2342,234,546,564])
+# test multiple seed values 
+seeds = np.array([42**4,231,42*4,123,3223,341,222])
 
 for noise in seeds:
 

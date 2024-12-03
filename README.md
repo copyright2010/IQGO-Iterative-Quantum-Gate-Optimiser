@@ -21,6 +21,18 @@ acc_test, acc_val, save_noise, cct = [], [], [], []
 # test multiple seed values for gaussian noise
 seeds = np.array([3646,5634,2342,234,546,564])
 
+from sklearn.datasets import load_iris
+from IQGO_module.iqgo_training import IQGO_train
+import numpy as np
+import pandas as pd
+
+X, y = load_iris(return_X_y=True, as_frame=True)
+
+acc_test, acc_val, save_noise, cct = [], [], [], []
+
+# test multiple seed values for gaussian noise
+seeds = np.array([3646,5634,2342,234,546,564])
+
 for noise in seeds:
 
     # initialise IQGO with the noise level, noise random seed and the kfold splits

@@ -44,15 +44,15 @@ labels = df['labels']
 
 acc_test, acc_val, save_noise, cct = [], [], [], []#
 
-seeds = np.array([2342])
+seeds = np.array([42**4,231,42*4,123,3223,341,222])
 
 for noise in seeds:
 
-    init_iqgo = IQGO_trainVQC(noise_level = 0.2, seed_val=noise, kfold_splits=5)
+    init_iqgo = IQGO_trainVQC(noise_level = 0.0, seed_val=noise, kfold_splits=3)
     
-    #fitted_circuit = init_iqgo.fit(data_train2, labels, number_of_layers = 3)
+    fitted_circuit = init_iqgo.fit(data_train2, labels, number_of_layers = 2)
 
-    fitted_circuit = np.array([4,4,4]) #best
+    # fitted_circuit = np.array([4,4,4]) #best
     
     predictions, column_means = init_iqgo.predict(data_train2, labels, fitted_circuit,'test')
     acc_test.append(column_means)

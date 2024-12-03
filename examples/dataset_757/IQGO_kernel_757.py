@@ -37,25 +37,28 @@ labels = df['labels']
 
 #seeds = np.array([34553,3646,5634,2342,234,546,564])
 
-acc_test, acc_val, save_noise, cct = [], [], [], []
+acc_test, acc_val, save_noise, cct, acc_train = [], [], [], [], []
 
-seeds = np.array([546])
+# seeds = np.array([546])
+seeds = np.array([42**4,231,42*4,123,3223])
 
 for noise in seeds:
 
-    init_iqgo = IQGO_train(noise_level = 0.3 , seed_val=noise, kfold_splits=5)
+    init_iqgo = IQGO_train(noise_level = 0.0 , seed_val=noise, kfold_splits=5)
 
-    #fitted_circuit = init_iqgo.fit(data_train=data_train2, labels=labels, number_of_layers = 3)
+    fitted_circuit = init_iqgo.fit(data_train=data_train2, labels=labels, number_of_layers = 3)
 
-    fitted_circuit = np.array([12, 12, 21]) #new
+    # fitted_circuit = np.array([12, 12, 21]) #new
+    # fitted_circuit = np.array([3, 6, 37]) #new
 
-    predictions, column_means = init_iqgo.predict(data_train = data_train2, labels = labels, compiled_circuit=fitted_circuit,mode='test')
+    predictions, column_means, train_acc = init_iqgo.predict(data_train = data_train2, labels = labels, compiled_circuit=fitted_circuit,mode='test')
     acc_test.append(column_means)
     
-    predictions, column_means = init_iqgo.predict(data_train = data_train2, labels = labels, compiled_circuit=fitted_circuit,mode='val')
+    predictions, column_means, train_acc = init_iqgo.predict(data_train = data_train2, labels = labels, compiled_circuit=fitted_circuit,mode='val')
     
     acc_val.append(column_means)
     save_noise.append(noise)
+    acc_train.append(train_acc)
     cct.append(fitted_circuit)
     print('done')
     print(fitted_circuit)
@@ -63,8 +66,15 @@ for noise in seeds:
 
 print('Acc test: ',acc_test)
 print('Acc val: ',acc_val)
+
+print('Acc mean train: ',np.mean(acc_train))
+print('Acc mean test: ',np.mean(acc_test))
+print('Acc mean val: ',np.mean(acc_val))
+
+
 save_noise = np.transpose(save_noise)
+
 print(save_noise)
 all = pd.DataFrame([save_noise, acc_test, acc_val, cct])
 
-#all.to_csv('results3.csv')
+all.to_csv('results3.csv')

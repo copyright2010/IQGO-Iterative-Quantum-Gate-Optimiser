@@ -8,7 +8,6 @@ pandas==2.2.2
 qiskit-aer==0.13.2
 qiskit==0.46.1
 qiskit_machine_learning==0.4.0
-qiskit_terra==0.46.2
 scikit_learn==1.5.1
 tensorflow==2.16.2
 tensorflow_intel==2.16.2

@@ -10,6 +10,13 @@ from IQGO_module.iqgo_optimize_module import IQGO, IQGO_VQC
 from sklearn.model_selection import StratifiedKFold
 from qiskit_machine_learning.kernels import QuantumKernel
 from qiskit import Aer
+from sklearn.metrics import (
+    balanced_accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    classification_report
+)
 
 class IQGO_train():
     def __init__(self, model=None, noise_level=0.2, seed_val=42, kfold_splits = 5):
@@ -31,6 +38,34 @@ class IQGO_train():
 
         return X_noisy
 
+    def compute_metrics(self, y_true, y_pred):
+        metrics = {"balanced_accuracy": balanced_accuracy_score(y_true, y_pred),
+
+            # Good default for imbalanced or multiclass classification
+            "precision_macro": precision_score(
+                y_true, y_pred, average="macro", zero_division=0
+            ),
+            "recall_macro": recall_score(
+                y_true, y_pred, average="macro", zero_division=0
+            ),
+            "f1_macro": f1_score(
+                y_true, y_pred, average="macro", zero_division=0
+            ),
+
+            # Weighted by class support
+            "precision_weighted": precision_score(
+                y_true, y_pred, average="weighted", zero_division=0
+            ),
+            "recall_weighted": recall_score(
+                y_true, y_pred, average="weighted", zero_division=0
+            ),
+            "f1_weighted": f1_score(
+                y_true, y_pred, average="weighted", zero_division=0
+            ),
+        }
+
+        return metrics
+
     def noise_ratio(self, X_noise, X_noise_free):
         noisy_signal = np.array([X_noise])
         original_signal = np.array([X_noise_free])
@@ -49,7 +84,7 @@ class IQGO_train():
         save_all, save_all_train, save_all_test, save, compiled_circuit = [], [], [], [], []
 
         if data_val is None and val_labels is None:
-            data_train, data_val, train_labels, val_labels = train_test_split(data_train, labels, train_size=0.66, random_state=123, stratify = labels)
+            data_train, data_val, train_labels, val_labels = train_test_split(data_train, labels, train_size=0.0028*23.5/10, random_state=self.seed_val, stratify = labels)
         
         data_train, train_labels = self.rus.fit_resample(data_train, train_labels)
 
@@ -64,7 +99,7 @@ class IQGO_train():
 
                 print('Train no.samples: ',Counter(y_train),'Test no.samples: ',Counter(y_test),'Val no.samples: ',Counter(val_labels))
 
-                X_test = self.add_gaussian_noise(X_test, mean=0, std=self.noise, seed=self.seed_val)
+                # X_test = self.add_gaussian_noise(X_test, mean=0, std=self.noise, seed=self.seed_val)
 
                 matrix_train_normalised = self.scaler.fit_transform(X_train)
                 matrix_test_normalised = self.scaler.transform(X_test)
@@ -86,14 +121,14 @@ class IQGO_train():
                     accuracies_train, accuracies_test = iqgo.fit_layer(self.model, matrix_test_normalised, y_test)
                     save_all_train.append(accuracies_train)
                     save_all_test.append(accuracies_test)
-                    accuracies = accuracies_test
+                    accuracies = accuracies_train
 
                 save_all.append(accuracies)
 
             column_means_train = pd.DataFrame(save_all_train).mean()
             column_means_test = pd.DataFrame(save_all_test).mean()
 
-            both_mean = pd.DataFrame([column_means_train,column_means_test]).mean()
+            both_mean = pd.DataFrame([column_means_train]).mean()
             column_means = pd.DataFrame(save_all).mean()  
 
             max_values = column_means[column_means == column_means.min()]
@@ -120,7 +155,7 @@ class IQGO_train():
     def predict(self, data_train=None, labels=None ,data_val=None, val_labels=None, compiled_circuit=None, mode = 'val'):
         
         if data_val is None and val_labels is None:
-            data_train, data_val, train_labels, val_labels = train_test_split(data_train, labels, train_size=0.66, random_state=123, stratify = labels)
+            data_train, data_val, train_labels, val_labels = train_test_split(data_train, labels, train_size=0.0028*23.5/10, random_state=self.seed_val, stratify = labels)
         
         data_train, train_labels = self.rus.fit_resample(data_train, train_labels)
         
@@ -167,6 +202,62 @@ class IQGO_train():
         
         return predictions, column_means.mean()
     
+    def predict_validate(self, data_train=None, labels=None ,data_val=None, val_labels=None, compiled_circuit=None):
+        
+        # If no validation set is provided, create one
+        if data_val is None and val_labels is None:
+            data_train, data_val, train_labels, val_labels = train_test_split(
+                data_train,
+                labels,
+                train_size=0.0028 * 23.5 / 10,
+                random_state=self.seed_val,
+                stratify=labels
+            )
+        else:
+            train_labels = labels
+
+        # Balance only the training set
+        data_train, train_labels = self.rus.fit_resample(data_train, train_labels)
+
+        print(
+            'Train no.samples: ',
+            Counter(train_labels),
+            'Val no.samples: ',
+            Counter(val_labels)
+        )
+
+        # Scale using full training set
+        matrix_train_normalised = self.scaler.fit_transform(data_train)
+        matrix_val_normalised = self.scaler.transform(data_val)
+
+        # Initialise model
+        if self.model is None:
+            self.model = SVC(kernel='precomputed')
+
+        # Train IQGO on the full training set
+        iqgo = IQGO(matrix_train_normalised, train_labels)
+
+        # Add compiled circuit layers
+        if compiled_circuit is not None and len(compiled_circuit) != 0:
+            for combination in compiled_circuit:
+                print('add layer: ', combination)
+                iqgo.add_layer(layer_combination=np.array(combination))
+
+        # Predict on validation set
+        predictions = iqgo.predict(self.model, matrix_val_normalised)
+
+        accuracy = balanced_accuracy_score(val_labels, predictions)
+        metrics = self.compute_metrics(val_labels, predictions)
+        
+        metrics_df = pd.DataFrame([metrics])
+
+        column_means = pd.DataFrame([accuracy])
+
+        print(column_means)
+
+        return predictions, column_means.mean(), metrics_df.mean(numeric_only=True)
+
+
     def compile_kernel(self, data_train=None, labels=None ,data_val=None, val_labels=None, compiled_circuit=None):
 
         iqgo = IQGO(data_train, labels)
@@ -175,16 +266,14 @@ class IQGO_train():
             for combination in compiled_circuit:
                 print('add layer: ', combination)
                 quantum_circuit = iqgo.add_layer(layer_combination=np.array(combination))
-        print(quantum_circuit)
+        
         kernel = QuantumKernel(feature_map=quantum_circuit, quantum_instance=Aer.get_backend('statevector_simulator'))
 
         matrix_train = kernel.evaluate(data_train)
         matrix_val = kernel.evaluate(x_vec=data_val, y_vec=data_train)
 
         return matrix_train, matrix_val
-
-
-
+    
 class IQGO_trainVQC():
     def __init__(self, noise_level=0.2, seed_val=42, kfold_splits = 5):
         self.noise = noise_level
@@ -222,7 +311,7 @@ class IQGO_trainVQC():
 
         save_all, save_all_train, save_all_test, save, compiled_circuit = [], [], [], [], []
 
-        data_train, data_val, train_labels, val_labels = train_test_split(data_train, labels, train_size=0.66, random_state=123, stratify = labels)
+        data_train, data_val, train_labels, val_labels = train_test_split(data_train, labels, train_size=0.66, random_state=self.seed_val, stratify = labels)
         
         data_train, train_labels = self.rus.fit_resample(data_train, train_labels)
 

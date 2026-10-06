@@ -15,7 +15,17 @@ from qiskit.utils import algorithm_globals
 from sklearn.preprocessing import OneHotEncoder
 
 criterion = nn.CrossEntropyLoss()
+def zero_one_loss_torch(y_true, y_pred, normalize=True):
+    y_true = torch.as_tensor(y_true)
+    y_pred = torch.as_tensor(y_pred)
 
+    incorrect = (y_true != y_pred).float()
+
+    if normalize:
+        return incorrect.mean()
+    else:
+        return incorrect.sum()
+    
 class IQGO:
     def __init__(self, X_train, y_train, training_noise = None):
         self.num_qubits = X_train.shape[1]
@@ -24,7 +34,8 @@ class IQGO:
         self.X_train = X_train  # Store X_train for kernel evaluation
         self.y_train = y_train
         self.training_noise = training_noise
-    
+        self.num_iqgo_layers = 0
+
     def regularized_kernel_matrix(self, kernel_matrix):
         lambda_reg = 0.05
         # Add L2 regularization term to the kernel matrix
@@ -36,14 +47,30 @@ class IQGO:
         alignment = np.sum(K * YYT) / np.sqrt(np.sum(K * K) * np.sum(YYT * YYT))
         return K + lambda_reg * (1 - alignment) * np.eye(K.shape[0], K.shape[1])
     
+    def add_cnot_ring(self, qc):
+        if self.num_qubits <= 1:
+            return qc
+
+        qc.barrier()
+
+        for q in range(self.num_qubits):
+            control = q
+            target = (q + 1) % self.num_qubits
+            qc.cx(control, target)
+
+        qc.barrier()
+
+        return qc
+
     def cross_entropy_loss(self, y_true, y_pred):
         # Ensure y_pred and y_true are tensors
-        y_pred = torch.tensor(y_pred.flatten(), dtype=torch.float32)
+        y_pred = torch.tensor(y_pred, dtype=torch.float32)
         y_true = torch.tensor(np.array(y_true), dtype=torch.float32)
         
         # Use PyTorch's cross-entropy loss
         loss_function = nn.CrossEntropyLoss()
-        return loss_function(y_pred, y_true)    
+        return zero_one_loss_torch(y_pred, y_true)    
+        # return loss_function(y_pred, y_true)    
     
     def fit_layer(self, model=None, X_test=None, y_test=None):
         self.model = model
@@ -59,25 +86,22 @@ class IQGO:
             # Create a copy of the current quantum circuit
             quantum_circuit_copy = self.quantum_circuit.copy()
             
+            # if self.num_iqgo_layers > 0:
+            #     quantum_circuit_copy = self.add_cnot_ring(quantum_circuit_copy)
+
             # Add the combination layer
             qc = BaseIQGO(number_of_qubits=self.num_qubits, combination=comb, quantum_circuit=quantum_circuit_copy, parameter_vector=self.parameter_vector).compile_circuit()
-                    
+            # qc = self.add_cnot_ring(qc)
+
             # Generate the quantum circuit for the feature map
-            #print(qc.draw())
+            print(qc.draw())
             
             # Create a quantum kernel with the feature map
             self.kernel = QuantumKernel(feature_map=qc, quantum_instance=Aer.get_backend('statevector_simulator'))
             # Evaluate the kernel matrix for training
             
             matrix_train = self.kernel.evaluate(self.X_train)
-
             #matrix_train = self.kernel_alignment(matrix_train, self.y_train)
-            constant_features = np.array([np.all(np.isclose(matrix_train[:, col], matrix_train[0, col])) for col in range(matrix_train.shape[1])])
-            constant_feature_indices = np.atleast_1d(np.where(constant_features)[0])
-
-            noise_level_kernel = 0.1  # Adjust based on your data
-            for i in constant_feature_indices:
-                matrix_train[:, i] -= np.random.normal(0, noise_level_kernel, size=matrix_train.shape[0])
 
             # Fit the model using the training kernel matrix
             model.fit(matrix_train, self.y_train)
@@ -106,17 +130,37 @@ class IQGO:
 
     def add_layer(self, layer_combination):
         if not self.quantum_circuit.data:
-                for i in range(self.num_qubits):
-                     self.quantum_circuit.h(i)
+            for i in range(self.num_qubits):
+                self.quantum_circuit.h(i)
+
         try:
             if layer_combination is not None:
-                self.quantum_circuit = BaseIQGO(number_of_qubits=self.num_qubits, combination=layer_combination, quantum_circuit=self.quantum_circuit, \
-                                                parameter_vector=self.parameter_vector).compile_circuit()
-        except:
-            print('add layer_combination')
-        
-        return self.quantum_circuit
 
+                # Add CNOT ring only before this layer,
+                # but only if there is already a previous IQGO layer.
+                # if self.num_iqgo_layers > 0:
+                #     self.quantum_circuit = self.add_cnot_ring(self.quantum_circuit)
+
+                # Add selected IQGO rotation layer
+                self.quantum_circuit = BaseIQGO(
+                    number_of_qubits=self.num_qubits,
+                    combination=layer_combination,
+                    quantum_circuit=self.quantum_circuit,
+                    parameter_vector=self.parameter_vector
+                ).compile_circuit()
+
+                self.num_iqgo_layers += 1
+
+                # print("Selected circuit:")
+                # print(self.quantum_circuit.draw())
+                # print("CX count:", self.quantum_circuit.count_ops().get("cx", 0))
+
+            return self.quantum_circuit
+
+        except Exception as e:
+            print("add layer_combination failed:", e)
+            return self.quantum_circuit
+        
     def add_gate(self):
 
         if not self.quantum_circuit.data:
@@ -129,8 +173,6 @@ class IQGO:
                 self.quantum_circuit.z(i)
         except:
             print('add layer_combination')
-
-
 
     def predict(self, model, X_val):
         # if self.kernel is None or self.X_train is None:
@@ -198,7 +240,7 @@ class IQGO_VQC:
             qc = BaseIQGO(number_of_qubits=self.num_qubits, combination=comb, quantum_circuit=quantum_circuit_copy, parameter_vector=self.parameter_vector).compile_circuit()
                     
             # Generate the quantum circuit for the feature map
-            # print(qc.draw())
+           # print(qc.draw())
 
             # Create a quantum kernel with the feature map
             #self.kernel = QuantumKernel(feature_map=qc, quantum_instance=Aer.get_backend('statevector_simulator'))

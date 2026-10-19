@@ -1,6 +1,6 @@
 # Dataset 412 experiments
 
-This folder is the IQGO version and the experiments used for the dataset 412 results.
+This folder is the IQGO version and the experiments used for the dataset 412 results, obtained in the Tutorial - Neurocomputing.
 
 `IQGO_module/` is the package that produced those runs. Run the scripts from this directory so Python imports this copy.
 
